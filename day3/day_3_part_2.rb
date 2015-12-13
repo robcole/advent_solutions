@@ -33,7 +33,7 @@ class Santa
   end
 
   def clone_and_update(new_opts)
-    merged_opts = { x: x, y: y, houses: houses }.merge(new_opts)
+    merged_opts = { x: x, y: y, houses: houses, name: name }.merge(new_opts)
     self.class.new(merged_opts)
   end
 end
