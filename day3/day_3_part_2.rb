@@ -58,4 +58,4 @@ end
 # santa = Santa.new(name: "Santa").move_multiple(santa_directions)
 # robot_santa = Santa.new(name: "Robot Santa").move_multiple(rs_directions)
 # total_houses = [santa.houses + robot_santa.houses].flatten
-# unique_houses = total_houses.map { |house| [house.x, house.y] }.uniq.size
+# unique_houses = House.unique_houses(total_houses)
