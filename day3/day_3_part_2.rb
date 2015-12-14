@@ -6,6 +6,7 @@ class Santa
     @y = y
     new_house = House.new(x: x, y: y)
     @houses = houses.push(new_house)
+    @name = name
   end
 
   def move(instruction)
