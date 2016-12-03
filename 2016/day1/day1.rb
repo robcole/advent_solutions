@@ -71,19 +71,23 @@ class Day1
         })
       end
 
-      solution = history[:coord_history].each_with_index.map do |coords, i|
-        next_coords = history[:coord_history][i + 1]
+      full_history = interpolate_visits(history[:coord_history])
+
+      first_double_visit = full_history
+                             .group_by { |x| x }
+                             .select { |_k, v| v.size > 1 }
+                             .map(&:first).first
+
+      calculate_distance(first_double_visit)
+    end
+
+    def interpolate_visits(coord_history)
+      coord_history.each_with_index.map do |coords, i|
+        next_coords = coord_history[i + 1]
         next if next_coords.nil?
 
         coords_between(coords1: coords, coords2: next_coords)
       end.compact.flatten
-
-      first_double_visit = solution
-                            .group_by { |x| x }
-                            .select { |_k, v| v.size > 1 }
-                            .map(&:first).first
-
-      calculate_distance(first_double_visit)
     end
 
     def find_amount(instruction)
