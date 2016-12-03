@@ -15,7 +15,6 @@ class Day2
       }
     end
 
-    # []
     def build_history(input)
       asdf = input.each_line.inject([]) do |arr, instructions|
         first_button = arr.last&.last || 5
@@ -32,8 +31,8 @@ class Day2
       end
     end
 
-    def part1
-      build_history(part1_input).map(&:last).join
+    def part1(input = part1_input)
+      build_history(input).map(&:last).join.to_i
     end
   end
 end
