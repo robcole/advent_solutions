@@ -1,16 +1,26 @@
 require 'byebug'
 class Day3
   class << self
-    def input
-      File
-        .read("input.txt")
+
+    def input_file
+      File.read("input.txt")
+    end
+
+    def part1_input
+      input_file
         .split(/\s+/)
         .map(&:to_i)
         .each_slice(3)
         .to_a
     end
 
-    def valid_triangles
+    def part2_input
+      part1_input
+        .each_slice(3)
+        .flat_map { |triangles| triangles[0].zip(triangles[1], triangles[2]) }
+    end
+
+    def valid_triangles(input = part1_input)
       input.count { |triangle| valid_triangle?(triangle) }
     end
 
