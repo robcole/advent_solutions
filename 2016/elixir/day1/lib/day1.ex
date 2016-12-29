@@ -14,14 +14,58 @@ defmodule Day1 do
     12
   """
   def distance_away(instructions) do
-    default = { nil, { 0, 0 } }
+    instructions
+    |> build_stops
+    |> find_final_stop
+    |> sum_distance
+  end
 
-    final_stop = Enum.reduce(instructions, default, fn(instruction, acc) ->
-      Day1.next_stop(elem(acc, 0), elem(acc, 1), instruction)
+  @doc """
+    Calculates the first duplicate stop in a set of instructions.
+
+  ## Examples
+
+    iex> Day1.first_duplicate_distance(["R8", "R4", "R4", "R8"])
+    4
+  """
+  def first_duplicate_distance(instructions) do
+    instructions
+    |> build_stops
+    |> group_duplicate_stops
+    |> find_first_duplicate_distance
+    |> sum_distance
+  end
+
+  def sum_distance({x, y}) do
+    abs(x) + abs(y)
+  end
+
+  def find_final_stop(all_stops) do
+    [final_stop] = Enum.take(all_stops.stops, -1)
+    final_stop
+  end
+
+  def build_stops(instructions) do
+    default = %{ orientation: nil, current_pos: { 0, 0 }, stops: [{ 0, 0 }] }
+
+    Enum.reduce(instructions, default, fn(instruction, acc) ->
+      next_stop = Day1.next_stop(acc.orientation, acc.current_pos, instruction)
+      [ _head | tail ] = Enum.reverse(acc.stops)
+      %{ next_stop | stops: Enum.reverse(tail) ++ next_stop.stops }
     end)
+  end
 
-    list = Tuple.to_list(elem(final_stop, 1))
-    Enum.reduce(list, fn(x, y) -> abs(x) + abs(y) end)
+  def find_first_duplicate_distance(grouped_stops) do
+    { pos, _count } = Enum.find grouped_stops, fn(x) ->
+      value = List.to_tuple(elem(x, 1))
+      tuple_size(value) > 1
+    end
+
+    pos
+  end
+
+  def group_duplicate_stops(parsed_instructions) do
+    Enum.group_by parsed_instructions.stops, fn(x) -> x end
   end
 
   @doc """
@@ -45,16 +89,14 @@ defmodule Day1 do
   ## Examples
 
     iex> Day1.next_stop(nil, {0, 0}, "R2")
-    { "R", { 2, 0 } }
+    %{ orientation: "R",
+       current_pos: { 2, 0 },
+       stops: [{0, 0}, {1, 0}, {2, 0}] }
 
     iex> Day1.next_stop("R", {2, 0}, "R2")
-    { "D", { 2, -2 } }
-
-    iex> Day1.next_stop("R", {2, 0}, "L2")
-    { "U", { 2, 2 } }
-
-    iex> Day1.next_stop("U", {0, 0}, "L2")
-    { "L", { -2, 0 } }
+    %{ orientation: "D",
+       current_pos: { 2, -2 },
+       stops: [{2, 0}, {2, -1}, {2, -2}] }
   """
   def next_stop(orientation, { x, y } = prev_coords, instruction) do
     { direction, distance } = parse_instruction(instruction)
@@ -67,7 +109,9 @@ defmodule Day1 do
       "D" -> { x, y - distance }
     end
 
-    { new_orientation, next_stop }
+    %{ orientation: new_orientation,
+       current_pos: next_stop,
+       stops: stops_visited(prev_coords, next_stop)}
   end
 
   @doc """
